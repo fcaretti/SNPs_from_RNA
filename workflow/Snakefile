@@ -1,14 +1,20 @@
-# Main entrypoint of the workflow. 
-# Please follow the best practices: 
+# Main entrypoint of the workflow.
+# Please follow the best practices:
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
-# in particular regarding the standardized folder structure mentioned there. 
+# in particular regarding the standardized folder structure mentioned there.
+
 
 rule all:
     input:
-        "output.txt"
+        "output.txt",
+
 
 rule example:
     output:
-        "output.txt"
+        "results/output.txt",
+    log:
+        "logs/picard/replace_rg/{sample}.log",
+    conda:
+        "./envs/test_env.yml"
     shell:
-        "echo 'Hello, World!' > {output}"
+        "echo 'Hello, World!' > {output} > {log} 2>&1"
