@@ -3,7 +3,4 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - snakemake
   - python=3.8
-  - numpy
-  - pandas
