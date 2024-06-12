@@ -2,3 +2,13 @@
 # Please follow the best practices: 
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
 # in particular regarding the standardized folder structure mentioned there. 
+
+rule all:
+    input:
+        "output.txt"
+
+rule example:
+    output:
+        "output.txt"
+    shell:
+        "echo 'Hello, World!' > {output}"
