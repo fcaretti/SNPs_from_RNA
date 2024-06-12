@@ -1,22 +1,14 @@
-# Main entrypoint of the workflow.
-# Please follow the best practices:
-# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
-# in particular regarding the standardized folder structure mentioned there.
+import glob
 
+
+configfile: "config/config.yml"
+
+# Access the data folder from the config
+data_folder = config["data"]["folder"]
+
+# Glob for sample files in the specified data folder
+sample_files = glob.glob(f"{data_folder}/*.bam")
 
 rule all:
     input:
-        "output.txt"
-
-rule example:
-    output:
-        "output.txt"
-    log:
-        "logs/test.log"
-    conda:
-        "./envs/test_env.yml"
-    shell:
-        """
-        echo 'Hello, World!' > {output}
-        echo 'Hello, World!' > {log} 2>&1
-        """
+        sample_files
