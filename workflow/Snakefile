@@ -6,15 +6,17 @@
 
 rule all:
     input:
-        "output.txt",
-
+        "output.txt"
 
 rule example:
     output:
-        "results/output.txt",
+        "output.txt"
     log:
-        "logs/picard/replace_rg/{sample}.log",
+        "logs/test.log"
     conda:
         "./envs/test_env.yml"
     shell:
-        "echo 'Hello, World!' > {output} > {log} 2>&1"
+        """
+        echo 'Hello, World!' > {output}
+        echo 'Hello, World!' > {log} 2>&1
+        """
