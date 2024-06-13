@@ -1,2 +1,6 @@
 data:
   folder: "data_path"
+
+reference:
+  folder: "genome_folder"
+  genome: "genome.fa"
