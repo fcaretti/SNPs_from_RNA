@@ -1,12 +1,12 @@
 rule markduplicates_bam:
     input:
-        bams="mapped/{sample}.bam",
+        bams="results/grouped/{sample}.bam",
     # optional to specify a list of BAMs; this has the same effect
     # of marking duplicates on separate read groups for a sample
     # and then merging
     output:
-        bam="dedup_bam/{sample}.bam",
-        metrics="dedup_bam/{sample}.metrics.txt",
+        bam="results/dedup/{sample}.bam",
+        metrics="results/dedup/{sample}.metrics.txt",
     log:
         "logs/dedup_bam/{sample}.log",
     params:
