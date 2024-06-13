@@ -1,22 +1,24 @@
-# Main entrypoint of the workflow.
-# Please follow the best practices:
-# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
-# in particular regarding the standardized folder structure mentioned there.
+import glob
+import os
+
+
+configfile: "config/config.yml"
+
+
+# Access the data folder from the config
+data_folder = config["data"]["folder"]
+
+
+sample_files = glob.glob(os.path.join(data_folder, "*.bam"))
+samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
+read_groups = [f"results/grouped/{sample}.bam" for sample in samples]
+deduped_files = [f"results/dedup/{sample}.bam" for sample in samples]
 
 
 rule all:
     input:
-        "output.txt"
+        deduped_files,
 
-rule example:
-    output:
-        "output.txt"
-    log:
-        "logs/test.log"
-    conda:
-        "./envs/test_env.yml"
-    shell:
-        """
-        echo 'Hello, World!' > {output}
-        echo 'Hello, World!' > {log} 2>&1
-        """
+
+include: "rules/add_or_replace_rg.smk"
+include: "rules/mark_duplicates.smk"

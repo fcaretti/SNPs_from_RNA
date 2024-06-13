@@ -17,7 +17,7 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           VALIDATE_SNAKEMAKE_SNAKEFMT: true
 
   Linting:
@@ -42,13 +42,13 @@ jobs:
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
       with:
-        directory: .test
+        directory: .
         snakefile: workflow/Snakefile
         args: "--use-conda --show-failed-logs --cores 3 --conda-cleanup-pkgs cache --all-temp"
 
     - name: Test report
       uses: snakemake/snakemake-github-action@v1.24.0
       with:
-        directory: .test
+        directory: .
         snakefile: workflow/Snakefile
         args: "--report report.zip"
