@@ -1,0 +1,6 @@
+data:
+  folder: ".test/data"
+
+reference:
+  folder: ".test/data"
+  genome: "placeholder.fa"

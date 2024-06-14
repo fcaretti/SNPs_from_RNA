@@ -2,15 +2,20 @@ import glob
 import os
 
 
-configfile: "config/config.yml"
+configfile: ".test/config/config.yml"
 
 
 # Access the data folder from the config
 data_folder = config["data"]["folder"]
-
+reference_folder = config["reference"]["folder"]
+genome_name = config["reference"]["genome"]
+reference = os.path.join(reference_folder, genome_name)
+reference_idx = f"{reference}.fai"
+reference_dict = f"{reference}.dict"
 
 sample_files = glob.glob(os.path.join(data_folder, "*.bam"))
 samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
+
 read_groups = [f"results/grouped/{sample}.bam" for sample in samples]
 deduped_files = [f"results/dedup/{sample}.bam" for sample in samples]
 
@@ -18,7 +23,10 @@ deduped_files = [f"results/dedup/{sample}.bam" for sample in samples]
 rule all:
     input:
         deduped_files,
+        reference_idx,
+        reference_dict,
 
 
 include: "rules/add_or_replace_rg.smk"
 include: "rules/mark_duplicates.smk"
+include: "rules/index_genome.smk"
