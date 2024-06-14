@@ -2,7 +2,7 @@ import glob
 import os
 
 
-configfile: "config/config.yml"
+configfile: ".test/config/config.yml"
 
 
 # Access the data folder from the config
