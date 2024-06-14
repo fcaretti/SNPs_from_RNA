@@ -31,6 +31,7 @@ jobs:
         snakefile: workflow/Snakefile
         args: "--lint"
 
+
   Testing:
     runs-on: ubuntu-latest
     needs: 
@@ -38,6 +39,9 @@ jobs:
       - Formatting
     steps:
     - uses: actions/checkout@v4
+
+    - name: List .test directory contents
+      run: ls -R .test
 
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
