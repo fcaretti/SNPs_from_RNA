@@ -1,6 +1,6 @@
 data:
-  folder: "/home/federico/Desktop/RNA_SNPs_calling/data"
+  folder: "data_folder"
 
 reference:
-  folder: "/home/federico/Desktop/RNA_SNPs_calling/data/reference/"
-  genome: "GRCh38.primary_assembly.genome.fa"
+  folder: "genome_folder"
+  genome: "genome.fa"
