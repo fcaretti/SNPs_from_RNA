@@ -40,14 +40,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: List .test directory contents
-      run: ls -R .test
-
-    - name: Check file permissions
-      run: |
-        chmod 644 .test/data/placeholder.fa
-        chmod 644 .test/data/placeholder.bam
-
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
       with:
