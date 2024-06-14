@@ -43,6 +43,9 @@ jobs:
     - name: List .test directory contents
       run: ls -R .test
 
+    - name: Check file permissions
+      run: ls -l .test/data
+
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
       with:
