@@ -40,6 +40,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: print directory
+      run: ls -l
+
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
       with:
