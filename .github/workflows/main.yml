@@ -40,8 +40,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Print .test directory
-      run: ls -R .test
 
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
@@ -51,6 +49,8 @@ jobs:
         args: "--dry-run --use-conda --show-failed-logs --cores 3 --conda-cleanup-pkgs cache --all-temp"
         stagein: |
           echo "Current working directory: $(pwd)"
+          echo "Listing contents of current directory:"
+          ls -R
           echo "Listing contents of .test directory:"
           ls -R .test
           echo "Listing contents of .test/data directory:"
