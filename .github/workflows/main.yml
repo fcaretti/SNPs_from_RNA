@@ -44,8 +44,9 @@ jobs:
       run: ls -R .test
 
     - name: Check file permissions
-      run: chmod 644 .test/data/placeholder.fa
-      run: chmod 644 .test/data/placeholder.bam
+      run: |
+        chmod 644 .test/data/placeholder.fa
+        chmod 644 .test/data/placeholder.bam
 
     - name: Test workflow
       uses: snakemake/snakemake-github-action@v1.24.0
