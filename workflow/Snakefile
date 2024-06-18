@@ -23,7 +23,7 @@ splitted_files = [f"results/split/{sample}.bam" for sample in samples]
 
 rule all:
     input:
-        deduped_files,
+        splitted_files,
 
 
 include: "rules/add_or_replace_rg.smk"
