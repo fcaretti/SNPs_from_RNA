@@ -20,15 +20,21 @@ known_sites_idx = f"{known_sites}.idx"
 sample_files = glob.glob(os.path.join(data_folder, "*.bam"))
 samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
 
-read_groups = [f"results/grouped/{sample}.bam" for sample in samples]
-deduped_files = [f"results/dedup/{sample}.bam" for sample in samples]
-splitted_files = [f"results/split/{sample}.bam" for sample in samples]
 recalibrated_files = [f"results/recal/{sample}.bam" for sample in samples]
+
+first_summaries = [
+    f"results/stats/{sample}_before_recal.summary.txt" for sample in samples
+]
+second_summaries = [
+    f"results/stats/{sample}_after_recal.summary.txt" for sample in samples
+]
 
 
 rule all:
     input:
         recalibrated_files,
+        first_summaries,
+        second_summaries,
 
 
 include: "rules/add_or_replace_rg.smk"
@@ -36,3 +42,4 @@ include: "rules/mark_duplicates.smk"
 include: "rules/index_genome.smk"
 include: "rules/split_n_cigar_reads.smk"
 include: "rules/recalibration.smk"
+include: "rules/alignment_summary.smk"
