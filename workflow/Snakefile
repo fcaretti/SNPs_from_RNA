@@ -2,7 +2,7 @@ import glob
 import os
 
 
-configfile: ".test/config/config.yml"
+configfile: "config/config.yml"
 
 
 # Access the data folder from the config
@@ -18,15 +18,15 @@ samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
 
 read_groups = [f"results/grouped/{sample}.bam" for sample in samples]
 deduped_files = [f"results/dedup/{sample}.bam" for sample in samples]
+splitted_files = [f"results/split/{sample}.bam" for sample in samples]
 
 
 rule all:
     input:
-        deduped_files,
-        reference_idx,
-        reference_dict,
+        splitted_files,
 
 
 include: "rules/add_or_replace_rg.smk"
 include: "rules/mark_duplicates.smk"
 include: "rules/index_genome.smk"
+include: "rules/split_n_cigar_reads.smk"

@@ -1,5 +1,5 @@
 data:
-  folder: "data_path"
+  folder: "data_folder"
 
 reference:
   folder: "genome_folder"

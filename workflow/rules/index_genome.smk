@@ -5,7 +5,7 @@ rule samtools_faidx:
     output:
         reference_idx,
     log:
-        f"{reference}.log",
+        f"logs/create_idx.log",
     params:
         extra="",
     wrapper:
@@ -19,7 +19,7 @@ rule create_dict:
     output:
         reference_dict,
     log:
-        "logs/picard/create_dict.log",
+        "logs/create_dict.log",
     params:
         extra="",  # Optional: extra arguments for picard.
     resources:
