@@ -12,6 +12,10 @@ genome_name = config["reference"]["genome"]
 reference = os.path.join(reference_folder, genome_name)
 reference_idx = f"{reference}.fai"
 reference_dict = f"{reference}.dict"
+known_sites_folder = config["known_sites"]["folder"]
+known_filename = config["known_sites"]["filename"]
+known_sites = os.path.join(known_sites_folder, known_filename)
+known_sites_idx = f"{known_sites}.idx"
 
 sample_files = glob.glob(os.path.join(data_folder, "*.bam"))
 samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
@@ -19,14 +23,16 @@ samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
 read_groups = [f"results/grouped/{sample}.bam" for sample in samples]
 deduped_files = [f"results/dedup/{sample}.bam" for sample in samples]
 splitted_files = [f"results/split/{sample}.bam" for sample in samples]
+recalibrated_files = [f"results/recal/{sample}.bam" for sample in samples]
 
 
 rule all:
     input:
-        splitted_files,
+        recalibrated_files,
 
 
 include: "rules/add_or_replace_rg.smk"
 include: "rules/mark_duplicates.smk"
 include: "rules/index_genome.smk"
 include: "rules/split_n_cigar_reads.smk"
+include: "rules/recalibration.smk"
