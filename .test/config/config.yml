@@ -4,3 +4,7 @@ data:
 reference:
   folder: ".test/data"
   genome: "placeholder.fa"
+
+known_sites:
+  folder: ".test/data"
+  filename: "placeholder.vcf"

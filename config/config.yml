@@ -1,6 +1,10 @@
 data:
-  folder: "data_folder"
+  folder: "/home/federico/Desktop/RNA_SNPs_calling/data"
 
 reference:
-  folder: "genome_folder"
-  genome: "genome.fa"
+  folder: "/home/federico/Desktop/RNA_SNPs_calling/data/reference"
+  genome: "GRCh38.primary_assembly.genome.fa"
+
+known_sites:
+  folder: "/home/federico/Desktop/RNA_SNPs_calling/data/reference"
+  filename: "resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
