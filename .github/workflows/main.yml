@@ -31,26 +31,7 @@ jobs:
         snakefile: workflow/Snakefile
         args: "--lint"
 
-  Testing_cd:
-    runs-on: ubuntu-latest
-    needs: 
-      - Linting
-      - Formatting
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Change to .test directory
-      run: cd .test
-
-    - name: Test workflow
-      run: |
-        snakemake --directory '.test' --snakefile 'workflow/Snakefile' --dry-run --use-conda --show-failed-logs --cores 3 --conda-cleanup-pkgs cache --all-temp
-      working-directory: .test
-
-    - name: Test report
-      run: |
-        snakemake --directory '.test' --snakefile 'workflow/Snakefile' --report report.zip
-      working-directory: .test
+  
 
   Testing:
     runs-on: ubuntu-latest
@@ -73,6 +54,8 @@ jobs:
           ls -R
           echo "Listing contents of .test directory:"
           ls -R .test
+          echo "Listing contents of .test/config directory:"
+          ls -R .test/config
           echo "Listing contents of .test/data directory:"
           ls -R .test/data
     - name: Test report
