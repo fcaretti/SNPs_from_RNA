@@ -22,13 +22,19 @@ samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
 
 recalibrated_files = [f"results/recal/{sample}.bam" for sample in samples]
 
-first_summaries = [f"results/stats/{sample}_before_recal.summary.txt" for sample in samples]
-second_summaries = [f"results/stats/{sample}_after_recal.summary.txt" for sample in samples]
+first_summaries = [
+    f"results/stats/{sample}_before_recal.summary.txt" for sample in samples
+]
+second_summaries = [
+    f"results/stats/{sample}_after_recal.summary.txt" for sample in samples
+]
+
+
 rule all:
     input:
         recalibrated_files,
         first_summaries,
-        second_summaries
+        second_summaries,
 
 
 include: "rules/add_or_replace_rg.smk"

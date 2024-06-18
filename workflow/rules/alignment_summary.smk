@@ -28,6 +28,3 @@ rule alignment_summary_after_recalibration:
         mem_mb=1024,
     wrapper:
         "v3.12.1/bio/picard/collectalignmentsummarymetrics"
-
-
-
