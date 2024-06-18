@@ -25,6 +25,7 @@ rule gatk_applybqsr:
         recal_table="results/recal_tables/{sample}.grp",
     output:
         bam="results/recal/{sample}.bam",
+        bai="results/recal/{sample}.bai",
     log:
         "logs/gatk_applybqsr/{sample}.log",
     params:
