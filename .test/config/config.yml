@@ -8,3 +8,6 @@ reference:
 known_sites:
   folder: ".test/data"
   filename: "placeholder.vcf"
+
+filtering:
+  params: ""

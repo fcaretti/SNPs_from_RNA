@@ -8,3 +8,6 @@ reference:
 known_sites:
   folder: "/home/federico/Desktop/RNA_SNPs_calling/data/reference"
   filename: "resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
+
+filtering:
+  params: "-i 'QUAL > 30 && INFO/DP > 10'"
