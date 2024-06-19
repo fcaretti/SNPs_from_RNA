@@ -37,7 +37,7 @@ haplo_calls = "results/calls/calls_gatk.vcf"
 
 rule all:
     input:
-        "results/calls/filtered_calls.vcf",
+        "results/calls/annotated_calls.vcf",
         first_summaries,
         second_summaries,
 
@@ -50,3 +50,4 @@ include: "rules/recalibration.smk"
 include: "rules/alignment_summary.smk"
 include: "rules/gatk_haplocaller.smk"
 include: "rules/filter.smk"
+include: "rules/vep.smk"

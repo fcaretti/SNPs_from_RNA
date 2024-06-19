@@ -11,3 +11,13 @@ known_sites:
 
 filtering:
   params: "-i 'QUAL > 30 && INFO/DP > 10'"
+
+vep:
+  cache_dir: "resources/vep/cache"
+  plugins_dir: "resources/vep/plugins"
+  species: "homo_sapiens"
+  build: "GRCh38"
+  release: "112"
+
+
+
