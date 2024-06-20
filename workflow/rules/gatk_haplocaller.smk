@@ -17,16 +17,44 @@ rule haplotype_caller:
         "v3.12.1/bio/gatk/haplotypecaller"
 
 
-rule merge_vcfs:
+
+rule bgzip:
     input:
-        vcfs=vcfs,
+        "results/calls_gatk/{sample}.vcf",
+    output:
+        temp("results/calls_gatk/{sample}.vcf.gz"),
+    params:
+        extra="", # optional
+    threads: 1
+    log:
+        "logs/bgzip/{sample}.log",
+    wrapper:
+        "v3.12.1-7-ge5bfa94/bio/bgzip"
+
+
+rule bcftools_index:
+    input:
+        "results/calls_gatk/{sample}.vcf.gz",
+    output:
+        temp("results/calls_gatk/{sample}.vcf.csi"),
+    log:
+        "logs/index/{sample}.log",
+    params:
+        extra="-c",  # optional parameters for bcftools index
+    wrapper:
+        "v3.12.1/bio/bcftools/index"
+
+
+rule bcftools_merge:
+    input:
+        calls=vcf_zips,
+        idx=vcf_idxs,
     output:
         "results/calls/calls_gatk.vcf",
     log:
-        "logs/picard/mergevcfs.log",
+        "logs/merge/merge_vcf.log",
     params:
-        extra="",
-    resources:
-        mem_mb=1024,
+        uncompressed_bcf=False,
+        extra="",  # optional parameters for bcftools concat (except -o)
     wrapper:
-        "v3.12.1/bio/picard/mergevcfs"
+        "v3.12.1/bio/bcftools/merge"
