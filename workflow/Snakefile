@@ -36,10 +36,9 @@ vcf_zips = [f"results/calls_gatk/{sample}.vcf.gz" for sample in samples]
 vcf_idxs = [f"results/calls_gatk/{sample}.vcf.csi" for sample in samples]
 haplo_calls = "results/calls/calls_gatk.vcf"
 
-
 rule all:
     input:
-        "results/calls/calls_gatk.vcf",
+        "results/calls/filtered_calls.vcf",
         first_summaries,
         second_summaries,
 
@@ -52,4 +51,3 @@ include: "rules/recalibration.smk"
 include: "rules/alignment_summary.smk"
 include: "rules/gatk_haplocaller.smk"
 include: "rules/filter.smk"
-include: "rules/vep.smk"

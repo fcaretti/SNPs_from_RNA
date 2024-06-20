@@ -53,7 +53,7 @@ rule bcftools_merge:
     log:
         "logs/merge/merge_vcf.log",
     params:
-        uncompressed_bcf=False,
+        uncompressed_bcf=True,
         extra="",  # optional parameters for bcftools concat (except -o)
     wrapper:
         "v3.12.1/bio/bcftools/merge"

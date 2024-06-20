@@ -1,23 +1,20 @@
 data:
-  folder: "/home/federico/Desktop/RNA_SNPs_calling/data"
+  folder: "data_folder"
 
 reference:
-  folder: "/home/federico/Desktop/RNA_SNPs_calling/data/reference"
-  genome: "GRCh38.primary_assembly.genome.fa"
+  folder: "reference_folder"
+  genome: "genome.fa"
 
 known_sites:
-  folder: "/home/federico/Desktop/RNA_SNPs_calling/data/reference"
-  filename: "resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
+  folder: "known_sites_folder"
+  filename: "ex: resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
 
 filtering:
-  params: "-i 'QUAL > 30 && INFO/DP > 10'"
+  params: "ex: -i 'QUAL > 30 && INFO/DP > 10'"
 
 vep:
-  cache_dir: "resources/vep/cache"
-  plugins_dir: "resources/vep/plugins"
-  species: "homo_sapiens"
-  build: "GRCh38"
-  release: "112"
-
-
-
+  cache_dir: "cache_folder"
+  plugins_dir: "plugins_folder"
+  species: ""
+  build: ""
+  release: ""
