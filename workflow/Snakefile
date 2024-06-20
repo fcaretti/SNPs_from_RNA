@@ -31,7 +31,8 @@ second_summaries = [
 calls = [f"results/calls/{sample}.vcf" for sample in samples]
 alns = [f"results/recal/{sample}.bam" for sample in samples]
 idxs = [f"results/recal/{sample}.bai" for sample in samples]
-vcfs = [f"results/calls_gatk/{sample}.vcf" for sample in samples]
+vcf_zips = [f"results/calls_gatk/{sample}.vcf.gz" for sample in samples]
+vcf_idxs = [f"results/calls_gatk/{sample}.vcf.csi" for sample in samples]
 haplo_calls = "results/calls/calls_gatk.vcf"
 
 
