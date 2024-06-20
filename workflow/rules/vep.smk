@@ -1,8 +1,8 @@
 rule annotate_variants:
     input:
         calls="results/calls/calls_gatk.vcf",  # .vcf, .vcf.gz or .bcf
-        cache=config['vep']['cache_dir'],  # can be omitted if fasta and gff are specified
-        plugins=config['vep']['plugins_dir'],
+        cache=config["vep"]["cache_dir"],  # can be omitted if fasta and gff are specified
+        plugins=config["vep"]["plugins_dir"],
         # optionally add reference genome fasta
         fasta=reference,
         fai=reference_idx,
@@ -25,9 +25,10 @@ rule annotate_variants:
     wrapper:
         "v3.12.1/bio/vep/annotate"
 
+
 rule get_vep_cache:
     output:
-        directory(config['vep']['cache_dir']),
+        directory(config["vep"]["cache_dir"]),
     params:
         species=config["vep"]["species"],
         build=config["vep"]["build"],
@@ -41,7 +42,7 @@ rule get_vep_cache:
 
 rule download_vep_plugins:
     output:
-        temp(directory(config['vep']['plugins_dir'])),
+        temp(directory(config["vep"]["plugins_dir"])),
     params:
         release=config["vep"]["release"],
     wrapper:

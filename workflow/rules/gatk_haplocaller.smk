@@ -17,14 +17,13 @@ rule haplotype_caller:
         "v3.12.1/bio/gatk/haplotypecaller"
 
 
-
 rule bgzip:
     input:
         "results/calls_gatk/{sample}.vcf",
     output:
         temp("results/calls_gatk/{sample}.vcf.gz"),
     params:
-        extra="", # optional
+        extra="",  # optional
     threads: 1
     log:
         "logs/bgzip/{sample}.log",

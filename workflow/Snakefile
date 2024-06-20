@@ -39,7 +39,7 @@ haplo_calls = "results/calls/calls_gatk.vcf"
 
 rule all:
     input:
-        "results/calls/annotated_calls.vcf",
+        "results/calls/calls_gatk.vcf",
         first_summaries,
         second_summaries,
 
