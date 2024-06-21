@@ -17,7 +17,6 @@ rule haplotype_caller:
         "v3.12.1/bio/gatk/haplotypecaller"
 
 
-
 rule bgzip:
     input:
         "results/calls_gatk/{sample}.vcf",
