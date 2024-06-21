@@ -13,8 +13,10 @@ filtering:
   params: "ex: -i 'QUAL > 30 && INFO/DP > 10'"
 
 vep:
-  cache_dir: "cache_folder"
-  plugins_dir: "plugins_folder"
-  species: ""
-  build: ""
-  release: ""
+  cache_dir: ""
+  zip_name: "ex: homo_sapiens_vep_112_GRCh38.tar.gz"
+  url: "ex: https://ftp.ensembl.org/pub/release-112/variation/indexed_vep_cache/homo_sapiens_vep_112_GRCh38.tar.gz"
+  image: "ex: docker://ensemblorg/ensembl-vep:release_112.0"
+  filters: "--filter "
+  impact_levels: [ "MODERATE", "HIGH"]
+  species: "ex: homo_sapiens"

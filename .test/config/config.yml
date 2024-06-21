@@ -11,3 +11,12 @@ known_sites:
 
 filtering:
   params: ""
+
+vep:
+  cache_dir: ""
+  zip_name: "homo_sapiens_vep_112_GRCh38.tar.gz"
+  url: "https://ftp.ensembl.org/pub/release-112/variation/indexed_vep_cache/homo_sapiens_vep_112_GRCh38.tar.gz"
+  image: "docker://ensemblorg/ensembl-vep:release_112.0"
+  filters: "--filter "
+  impact_levels: [ "MODERATE", "HIGH"]
+  species: "homo_sapiens"
