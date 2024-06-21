@@ -17,6 +17,7 @@ rule haplotype_caller:
         "v3.12.1/bio/gatk/haplotypecaller"
 
 
+
 rule bgzip:
     input:
         "results/calls_gatk/{sample}.vcf",
@@ -53,7 +54,7 @@ rule bcftools_merge:
     log:
         "logs/merge/merge_vcf.log",
     params:
-        uncompressed_bcf=True,
+        uncompressed_bcf=False,
         extra="",  # optional parameters for bcftools concat (except -o)
     wrapper:
         "v3.12.1/bio/bcftools/merge"
