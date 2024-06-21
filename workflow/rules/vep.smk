@@ -3,14 +3,8 @@ rule annotate_variants:
         calls="results/calls/calls_gatk.vcf",  # .vcf, .vcf.gz or .bcf
         cache=config["vep"]["cache_dir"],  # can be omitted if fasta and gff are specified
         plugins=config["vep"]["plugins_dir"],
-        # optionally add reference genome fasta
         fasta=reference,
         fai=reference_idx,
-        # gff="annotation.gff",
-        # csi="annotation.gff.csi", # tabix index
-        # add mandatory aux-files required by some plugins if not present in the VEP plugin directory specified above.
-        # aux files must be defined as following: "<plugin> = /path/to/file" where plugin must be in lowercase
-        # revel = path/to/revel_scores.tsv.gz
     output:
         calls="results/calls/annotated_calls.vcf",  # .vcf, .vcf.gz or .bcf
         stats="results/calls/variants.html",
