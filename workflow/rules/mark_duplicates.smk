@@ -1,9 +1,9 @@
 rule markduplicates_bam:
     input:
-        bams="results/grouped/{sample}.bam",
+        bams=results_folder + "/grouped/{sample}.bam",
     output:
-        bam=temp("results/dedup/{sample}.bam"),
-        metrics="results/dedup/{sample}.metrics.txt",
+        bam=temp(results_folder + "/dedup/{sample}.bam"),
+        metrics=results_folder + "/dedup/{sample}.metrics.txt",
     log:
         "logs/dedup_bam/{sample}.log",
     params:

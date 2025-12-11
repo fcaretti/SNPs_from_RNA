@@ -1,11 +1,11 @@
 rule splitncigarreads:
     input:
-        bam="results/dedup/{sample}.bam",
+        bam=results_folder + "/sanitized/{sample}.bam",
         ref=reference,
         idx=reference_idx,
         dict=reference_dict,
     output:
-        temp("results/split/{sample}.bam"),
+        temp(results_folder + "/split/{sample}.bam"),
     log:
         "logs/splitNCIGARreads/{sample}.log",
     params:

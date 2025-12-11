@@ -40,10 +40,10 @@ rule unzip_vep_cache:
 
 rule vep_annotation:
     input:
-        vcf="results/calls/filtered_calls.vcf",
+        vcf=f"{results_folder}/calls/filtered_calls_gatk.vcf",
         dir="{cache_dir}/{species}".format(**config["vep"]),
     output:
-        annotated_vcf="results/calls/annotated_calls.vcf",
+        annotated_vcf=f"{results_folder}/calls/annotated_calls.vcf",
     params:
         cache_dir=lambda wc: config["vep"]["cache_dir"],
         species=lambda wc: config["vep"]["species"],

@@ -1,9 +1,9 @@
 rule alignment_summary_before_recalibration:
     input:
         ref=reference,
-        bam="results/split/{sample}.bam",
+        bam=results_folder + "/split/{sample}.bam",
     output:
-        "results/stats/{sample}_before_recal.summary.txt",
+        results_folder + "/stats/{sample}_before_recal.summary.txt",
     log:
         "logs/picard/alignment-summary/{sample}.log",
     params:
@@ -17,9 +17,9 @@ rule alignment_summary_before_recalibration:
 rule alignment_summary_after_recalibration:
     input:
         ref=reference,
-        bam="results/recal/{sample}.bam",
+        bam=results_folder + "/recal/{sample}.bam",
     output:
-        "results/stats/{sample}_after_recal.summary.txt",
+        results_folder + "/stats/{sample}_after_recal.summary.txt",
     log:
         "logs/picard/alignment-summary/{sample}.log",
     params:

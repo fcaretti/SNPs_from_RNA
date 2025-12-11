@@ -2,7 +2,7 @@ import glob
 import os
 
 
-configfile: "config/config.yml"
+configfile: "config/actual_config.yml"
 
 
 # Define data and reference files
@@ -12,6 +12,10 @@ genome_name = config["reference"]["genome"]
 reference = os.path.join(reference_folder, genome_name)
 reference_idx = f"{reference}.fai"
 reference_dict = f"{reference}.dict"
+
+# Results folder from config
+results_folder = config['results']['folder']
+
 # Used only in FreeBayes
 known_sites_folder = config["known_sites"]["folder"]
 known_filename = config["known_sites"]["filename"]
@@ -22,34 +26,44 @@ sample_files = glob.glob(os.path.join(data_folder, "*.bam"))
 samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
 
 first_summaries = [
-    f"results/stats/{sample}_before_recal.summary.txt" for sample in samples
+    f"{results_folder}/stats/{sample}_before_recal.summary.txt" for sample in samples
 ]
 second_summaries = [
-    f"results/stats/{sample}_after_recal.summary.txt" for sample in samples
+    f"{results_folder}/stats/{sample}_after_recal.summary.txt" for sample in samples
 ]
+calls = [f"{results_folder}/calls/{sample}.vcf" for sample in samples]
+alns = [f"{results_folder}/recal/{sample}.bam" for sample in samples]
+idxs = [f"{results_folder}/recal/{sample}.bai" for sample in samples]
+vcfs = [f"{results_folder}/calls_gatk/{sample}.vcf" for sample in samples]
+vcf_zips = [f"{results_folder}/calls_gatk/{sample}.vcf.gz" for sample in samples]
+vcf_idxs = [f"{results_folder}/calls_gatk/{sample}.vcf.csi" for sample in samples]
 
-calls = [f"results/calls/{sample}.vcf" for sample in samples]
-alns = [f"results/recal/{sample}.bam" for sample in samples]
-idxs = [f"results/recal/{sample}.bai" for sample in samples]
-vcfs = [f"results/calls_gatk/{sample}.vcf" for sample in samples]
-vcf_zips = [f"results/calls_gatk/{sample}.vcf.gz" for sample in samples]
-vcf_idxs = [f"results/calls_gatk/{sample}.vcf.csi" for sample in samples]
-haplo_calls = "results/calls/calls_gatk.vcf"
-
+haplo_calls = f"{results_folder}/calls/calls_gatk.vcf"
+fb_calls = f"{results_folder}/calls/calls_freebayes.vcf"
+dv_calls = f"{results_folder}/calls/calls_deepvariant.vcf"
 
 rule all:
     input:
-        "results/calls/annotated_calls.vcf",
+        #f"{results_folder}/calls/annotated_calls.vcf",
         first_summaries,
         second_summaries,
+        #f"{results_folder}/calls/filtered_calls_freebayes.vcf",
+        #f"{results_folder}/calls/filtered_calls_deepvariant.vcf",
+        #haplo_calls,
+        fb_calls,
+        #dv_calls,
+        #f"{results_folder}/calls_deepvariant/TT71.vcf.gz",
 
 
 include: "rules/add_or_replace_rg.smk"
 include: "rules/mark_duplicates.smk"
 include: "rules/index_genome.smk"
+include: "rules/sanitize.smk"
 include: "rules/split_n_cigar_reads.smk"
 include: "rules/recalibration.smk"
 include: "rules/alignment_summary.smk"
 include: "rules/gatk_haplocaller.smk"
+include: "rules/freebayes.smk"
+include: "rules/deepvariant.smk"
 include: "rules/filter.smk"
 include: "rules/vep.smk"

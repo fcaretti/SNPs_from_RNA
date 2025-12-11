@@ -1,10 +1,10 @@
 rule haplotype_caller:
     input:
         # single or list of bam files
-        bam="results/recal/{sample}.bam",
+        bam=results_folder + "/recal/{sample}.bam",
         ref=reference,
     output:
-        vcf="results/calls_gatk/{sample}.vcf",
+        vcf=results_folder + "/calls_gatk/{sample}.vcf",
     log:
         "logs/gatk/haplotypecaller/{sample}.log",
     params:
@@ -19,9 +19,9 @@ rule haplotype_caller:
 
 rule bgzip:
     input:
-        "results/calls_gatk/{sample}.vcf",
+        results_folder + "/calls_gatk/{sample}.vcf",
     output:
-        temp("results/calls_gatk/{sample}.vcf.gz"),
+        temp(results_folder + "/calls_gatk/{sample}.vcf.gz"),
     params:
         extra="",  # optional
     threads: 1
@@ -33,9 +33,9 @@ rule bgzip:
 
 rule bcftools_index:
     input:
-        "results/calls_gatk/{sample}.vcf.gz",
+        results_folder + "/calls_gatk/{sample}.vcf.gz",
     output:
-        temp("results/calls_gatk/{sample}.vcf.csi"),
+        temp(results_folder + "/calls_gatk/{sample}.vcf.csi"),
     log:
         "logs/index/{sample}.log",
     params:
@@ -49,7 +49,7 @@ rule bcftools_merge:
         calls=vcf_zips,
         idx=vcf_idxs,
     output:
-        "results/calls/calls_gatk.vcf",
+        results_folder + "/calls/calls_gatk.vcf",
     log:
         "logs/merge/merge_vcf.log",
     params:

@@ -1,12 +1,13 @@
 # Access the data folder from the config
 data_folder = config["data"]["folder"]
+SAMPLES = glob_wildcards(os.path.join(data_folder, "{sample}.bam")).sample
 
 
 rule replace_rg:
     input:
-        lambda wildcards: os.path.join(data_folder, f"{wildcards.sample}.bam"),
+        os.path.join(data_folder, "{sample}.bam"),
     output:
-        temp("results/grouped/{sample}.bam"),
+        temp(results_folder + "/grouped/{sample}.bam"),
     log:
         "logs/replace_rg/{sample}.log",
     params:

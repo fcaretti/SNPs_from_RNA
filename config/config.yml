@@ -1,6 +1,9 @@
 data:
   folder: "data_folder"
 
+results:
+  folder: "results_folder"
+
 reference:
   folder: "reference_folder"
   genome: "genome.fa"
