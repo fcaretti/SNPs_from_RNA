@@ -8,13 +8,13 @@ rule haplotype_caller:
     log:
         "logs/gatk/haplotypecaller/{sample}.log",
     params:
-        extra=config['variant_calling']['gatk']['extra'],
-        java_opts=config['variant_calling']['gatk']['java_opts'],
-    threads: config['resources']['gatk_haplotypecaller']['threads']
+        extra=config["variant_calling"]["gatk"]["extra"],
+        java_opts=config["variant_calling"]["gatk"]["java_opts"],
+    threads: config["resources"]["gatk_haplotypecaller"]["threads"]
     resources:
-        mem_mb=config['resources']['gatk_haplotypecaller']['mem_mb'],
+        mem_mb=config["resources"]["gatk_haplotypecaller"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/gatk/haplotypecaller"
+        config["wrappers"]["version"] + "/bio/gatk/haplotypecaller"
 
 
 rule bgzip:
@@ -24,13 +24,13 @@ rule bgzip:
         temp(results_folder + "/calls_gatk/{sample}.vcf.gz"),
     params:
         extra="",  # optional
-    threads: config['resources']['bgzip']['threads']
+    threads: config["resources"]["bgzip"]["threads"]
     resources:
-        mem_mb=config['resources']['bgzip']['mem_mb']
+        mem_mb=config["resources"]["bgzip"]["mem_mb"],
     log:
         "logs/bgzip/{sample}.log",
     wrapper:
-        config['wrappers']['version'] + "/bio/bgzip"
+        config["wrappers"]["version"] + "/bio/bgzip"
 
 
 rule bcftools_index:
@@ -41,12 +41,12 @@ rule bcftools_index:
     log:
         "logs/index/{sample}.log",
     params:
-        extra=config['variant_calling']['gatk']['index_extra'],
-    threads: config['resources']['bcftools_index']['threads']
+        extra=config["variant_calling"]["gatk"]["index_extra"],
+    threads: config["resources"]["bcftools_index"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_index']['mem_mb']
+        mem_mb=config["resources"]["bcftools_index"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/bcftools/index"
+        config["wrappers"]["version"] + "/bio/bcftools/index"
 
 
 rule bcftools_merge:
@@ -59,9 +59,9 @@ rule bcftools_merge:
         "logs/merge/merge_vcf.log",
     params:
         uncompressed_bcf=False,
-        extra=config['variant_calling']['gatk']['merge_extra'],
-    threads: config['resources']['bcftools_merge']['threads']
+        extra=config["variant_calling"]["gatk"]["merge_extra"],
+    threads: config["resources"]["bcftools_merge"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_merge']['mem_mb']
+        mem_mb=config["resources"]["bcftools_merge"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/bcftools/merge"
+        config["wrappers"]["version"] + "/bio/bcftools/merge"

@@ -51,8 +51,8 @@ rule vep_annotation:
     container:
         config["vep"]["image"]
     resources:
-        cores=config['resources']['vep']['cores'],
-        mem_mb=config['resources']['vep']['mem_mb']
+        cores=config["resources"]["vep"]["cores"],
+        mem_mb=config["resources"]["vep"]["mem_mb"],
     log:
         log_file="logs/vep/vep_annotation.log",
     shell:

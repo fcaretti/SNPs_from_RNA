@@ -11,6 +11,7 @@ Use cases:
 - Speed up analysis by reducing data size
 """
 
+
 rule filter_bam_regions:
     input:
         bam=data_folder + "/{sample}.bam",
@@ -19,12 +20,13 @@ rule filter_bam_regions:
         bam=results_folder + "/filtered_bams/{sample}.bam",
         bai=results_folder + "/filtered_bams/{sample}.bam.bai",
     params:
-        regions=lambda wildcards: " ".join(config.get('bam_filtering', {}).get('regions', [])),
-        bed_file=lambda wildcards: config.get('bam_filtering', {}).get('bed_file', ''),
+        regions=lambda wildcards: " ".join(
+            config.get("bam_filtering", {}).get("regions", [])
+        ),
+        bed_file=lambda wildcards: config.get("bam_filtering", {}).get("bed_file", ""),
     log:
-        "logs/filter_bam/{sample}.log"
-    threads:
-        config.get('resources', {}).get('filter_bam', {}).get('threads', 4)
+        "logs/filter_bam/{sample}.log",
+    threads: config.get("resources", {}).get("filter_bam", {}).get("threads", 4)
     conda:
         "../envs/samtools.yml"
     shell:

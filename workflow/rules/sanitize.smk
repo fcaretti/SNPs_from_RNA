@@ -1,18 +1,22 @@
 import os, glob
 
 # Discover samples
-SAMPLES = [os.path.basename(p).replace(".bam","")
-           for p in glob.glob(results_folder + "/dedup/*.bam")]
+SAMPLES = [
+    os.path.basename(p).replace(".bam", "")
+    for p in glob.glob(results_folder + "/dedup/*.bam")
+]
+
 
 rule sanitize_bam_for_splitncigar:
     input:
-        bam = results_folder + "/dedup/{sample}.bam",
-        dict = reference_dict
+        bam=results_folder + "/dedup/{sample}.bam",
+        dict=reference_dict,
     output:
-        bam = results_folder + "/sanitized/{sample}.bam",
-        bai = results_folder + "/sanitized/{sample}.bam.bai"
+        bam=results_folder + "/sanitized/{sample}.bam",
+        bai=results_folder + "/sanitized/{sample}.bam.bai",
     threads: 4
-    log: results_folder + "/logs/sanitize/{sample}.log"
+    log:
+        results_folder + "/logs/sanitize/{sample}.log",
     shell:
         """
         # Create directories first

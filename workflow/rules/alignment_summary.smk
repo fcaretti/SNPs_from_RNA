@@ -13,11 +13,11 @@ rule alignment_summary_before_recalibration:
             f"--METRIC_ACCUMULATION_LEVEL {config['preprocessing']['alignment_summary']['metric_accumulation_level']} "
             f"{config['preprocessing']['alignment_summary']['extra']}"
         ),
-    threads: config['resources']['alignment_summary']['threads']
+    threads: config["resources"]["alignment_summary"]["threads"]
     resources:
-        mem_mb=config['resources']['alignment_summary']['mem_mb'],
+        mem_mb=config["resources"]["alignment_summary"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/picard/collectalignmentsummarymetrics"
+        config["wrappers"]["version"] + "/bio/picard/collectalignmentsummarymetrics"
 
 
 rule alignment_summary_after_recalibration:
@@ -35,8 +35,8 @@ rule alignment_summary_after_recalibration:
             f"--METRIC_ACCUMULATION_LEVEL {config['preprocessing']['alignment_summary']['metric_accumulation_level']} "
             f"{config['preprocessing']['alignment_summary']['extra']}"
         ),
-    threads: config['resources']['alignment_summary']['threads']
+    threads: config["resources"]["alignment_summary"]["threads"]
     resources:
-        mem_mb=config['resources']['alignment_summary']['mem_mb'],
+        mem_mb=config["resources"]["alignment_summary"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/picard/collectalignmentsummarymetrics"
+        config["wrappers"]["version"] + "/bio/picard/collectalignmentsummarymetrics"

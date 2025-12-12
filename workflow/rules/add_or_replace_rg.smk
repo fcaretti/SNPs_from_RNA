@@ -17,8 +17,8 @@ rule replace_rg:
             f"--RGSM {{sample}} "
             f"{config['preprocessing']['read_groups']['extra']}"
         ),
-    threads: config['resources']['add_replace_rg']['threads']
+    threads: config["resources"]["add_replace_rg"]["threads"]
     resources:
-        mem_mb=config['resources']['add_replace_rg']['mem_mb'],
+        mem_mb=config["resources"]["add_replace_rg"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/picard/addorreplacereadgroups"
+        config["wrappers"]["version"] + "/bio/picard/addorreplacereadgroups"

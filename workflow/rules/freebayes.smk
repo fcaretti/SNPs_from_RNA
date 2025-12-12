@@ -18,12 +18,12 @@ rule freebayes:
             "--genotype-qualities "
             f"{config['variant_calling']['freebayes']['extra']}"
         ),
-        chunksize=config['variant_calling']['freebayes']['chunksize'],
-    threads: config['resources']['freebayes']['threads']
+        chunksize=config["variant_calling"]["freebayes"]["chunksize"],
+    threads: config["resources"]["freebayes"]["threads"]
     conda:
         "../envs/freebayes-1.3.9.yml"
     resources:
-        mem_mb=config['resources']['freebayes']['mem_mb']
+        mem_mb=config["resources"]["freebayes"]["mem_mb"],
     # If you prefer to pin a conda env, keep it here; wrapper will still be used.
     wrapper:
         "v3.12.1/bio/freebayes"

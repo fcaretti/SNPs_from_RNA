@@ -11,8 +11,8 @@ rule markduplicates_bam:
             f"--REMOVE_DUPLICATES {str(config['preprocessing']['mark_duplicates']['remove_duplicates']).lower()} "
             f"{config['preprocessing']['mark_duplicates']['extra']}"
         ),
-    threads: config['resources']['mark_duplicates']['threads']
+    threads: config["resources"]["mark_duplicates"]["threads"]
     resources:
-        mem_mb=config['resources']['mark_duplicates']['mem_mb'],
+        mem_mb=config["resources"]["mark_duplicates"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/picard/markduplicates"
+        config["wrappers"]["version"] + "/bio/picard/markduplicates"

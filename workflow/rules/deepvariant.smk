@@ -11,14 +11,14 @@ rule deepvariant:
     log:
         "logs/deepvariant/{sample}.log",
     params:
-        model_type=config['variant_calling']['deepvariant']['model_type'],
-        extra=config['variant_calling']['deepvariant']['extra'],
-        tmpdir=config['variant_calling']['deepvariant']['tmpdir'],
-    threads: config['resources']['deepvariant']['threads']
+        model_type=config["variant_calling"]["deepvariant"]["model_type"],
+        extra=config["variant_calling"]["deepvariant"]["extra"],
+        tmpdir=config["variant_calling"]["deepvariant"]["tmpdir"],
+    threads: config["resources"]["deepvariant"]["threads"]
     resources:
-        mem_mb=config['resources']['deepvariant']['mem_mb'],
+        mem_mb=config["resources"]["deepvariant"]["mem_mb"],
     container:
-        config['variant_calling']['deepvariant']['container']
+        config["variant_calling"]["deepvariant"]["container"]
     shell:
         """
         export TMPDIR={params.tmpdir}
@@ -32,7 +32,7 @@ rule deepvariant:
             {params.extra} \
             2> {log}"""
 
-            
+
 # Index DeepVariant VCFs (same as GATK)
 rule deepvariant_bcftools_index:
     input:
@@ -42,27 +42,32 @@ rule deepvariant_bcftools_index:
     log:
         "logs/deepvariant_index/{sample}.log",
     params:
-        extra=config['variant_calling']['deepvariant']['index_extra'],
-    threads: config['resources']['bcftools_index']['threads']
+        extra=config["variant_calling"]["deepvariant"]["index_extra"],
+    threads: config["resources"]["bcftools_index"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_index']['mem_mb']
+        mem_mb=config["resources"]["bcftools_index"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/bcftools/index"
+        config["wrappers"]["version"] + "/bio/bcftools/index"
+
 
 # Merge DeepVariant calls (same as GATK)
 rule merge_deepvariant:
     input:
-        calls=expand(results_folder + "/calls_deepvariant/{sample}.vcf.gz", sample=samples),
-        idx=expand(results_folder + "/calls_deepvariant/{sample}.vcf.csi", sample=samples),
+        calls=expand(
+            results_folder + "/calls_deepvariant/{sample}.vcf.gz", sample=samples
+        ),
+        idx=expand(
+            results_folder + "/calls_deepvariant/{sample}.vcf.csi", sample=samples
+        ),
     output:
         results_folder + "/calls/calls_deepvariant.vcf",
     log:
         "logs/merge/merge_deepvariant.log",
     params:
         uncompressed_bcf=False,
-        extra=config['variant_calling']['deepvariant']['merge_extra'],
-    threads: config['resources']['bcftools_merge']['threads']
+        extra=config["variant_calling"]["deepvariant"]["merge_extra"],
+    threads: config["resources"]["bcftools_merge"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_merge']['mem_mb']
+        mem_mb=config["resources"]["bcftools_merge"]["mem_mb"],
     wrapper:
-        config['wrappers']['version'] + "/bio/bcftools/merge"
+        config["wrappers"]["version"] + "/bio/bcftools/merge"

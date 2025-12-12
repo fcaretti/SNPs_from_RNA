@@ -11,6 +11,7 @@ Each variant caller can have its own filtering thresholds optimized for its
 characteristics.
 """
 
+
 # ============================================================================
 # Helper Function: Determine Filter Parameters
 # ============================================================================
@@ -62,11 +63,15 @@ rule bcf_filter_gatk:
     params:
         filter_expr=get_filter_params("gatk"),
         extra="",
-        qual_percentile=config.get('filtering', {}).get('percentile', {}).get('qual_percentile', 10),
-        dp_percentile=config.get('filtering', {}).get('percentile', {}).get('dp_percentile', 10),
-    threads: config['resources']['bcftools_filter']['threads']
+        qual_percentile=config.get("filtering", {})
+        .get("percentile", {})
+        .get("qual_percentile", 10),
+        dp_percentile=config.get("filtering", {})
+        .get("percentile", {})
+        .get("dp_percentile", 10),
+    threads: config["resources"]["bcftools_filter"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_filter']['mem_mb']
+        mem_mb=config["resources"]["bcftools_filter"]["mem_mb"],
     conda:
         "../envs/cyvcf2.yml"
     shell:
@@ -97,11 +102,15 @@ rule bcf_filter_freebayes:
     params:
         filter_expr=get_filter_params("freebayes"),
         extra="",
-        qual_percentile=config.get('filtering', {}).get('percentile', {}).get('qual_percentile', 10),
-        dp_percentile=config.get('filtering', {}).get('percentile', {}).get('dp_percentile', 10),
-    threads: config['resources']['bcftools_filter']['threads']
+        qual_percentile=config.get("filtering", {})
+        .get("percentile", {})
+        .get("qual_percentile", 10),
+        dp_percentile=config.get("filtering", {})
+        .get("percentile", {})
+        .get("dp_percentile", 10),
+    threads: config["resources"]["bcftools_filter"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_filter']['mem_mb']
+        mem_mb=config["resources"]["bcftools_filter"]["mem_mb"],
     conda:
         "../envs/cyvcf2.yml"
     shell:
@@ -132,11 +141,15 @@ rule bcf_filter_deepvariant:
     params:
         filter_expr=get_filter_params("deepvariant"),
         extra="",
-        qual_percentile=config.get('filtering', {}).get('percentile', {}).get('qual_percentile', 10),
-        dp_percentile=config.get('filtering', {}).get('percentile', {}).get('dp_percentile', 10),
-    threads: config['resources']['bcftools_filter']['threads']
+        qual_percentile=config.get("filtering", {})
+        .get("percentile", {})
+        .get("qual_percentile", 10),
+        dp_percentile=config.get("filtering", {})
+        .get("percentile", {})
+        .get("dp_percentile", 10),
+    threads: config["resources"]["bcftools_filter"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_filter']['mem_mb']
+        mem_mb=config["resources"]["bcftools_filter"]["mem_mb"],
     conda:
         "../envs/cyvcf2.yml"
     shell:

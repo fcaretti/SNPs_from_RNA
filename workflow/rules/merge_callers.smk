@@ -15,6 +15,7 @@ Two strategies are supported:
 The strategy is controlled by config['variant_calling']['merge_strategy']
 """
 
+
 # ============================================================================
 # OR Strategy (Union): Merge all variants from all callers
 # ============================================================================
@@ -29,9 +30,9 @@ rule merge_callers_union:
         # --force-samples: Allow sample name mismatches
         # -m none: Do not merge into a single record (keep all INFO from all callers)
         extra="--force-samples -m none",
-    threads: config['resources']['bcftools_merge']['threads']
+    threads: config["resources"]["bcftools_merge"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_merge']['mem_mb']
+        mem_mb=config["resources"]["bcftools_merge"]["mem_mb"],
     conda:
         "../envs/bcftools.yml"
     shell:
@@ -58,9 +59,9 @@ rule merge_callers_intersection:
         "logs/merge/merge_intersection.log",
     params:
         n_callers=len(enabled_callers),
-    threads: config['resources']['bcftools_merge']['threads']
+    threads: config["resources"]["bcftools_merge"]["threads"]
     resources:
-        mem_mb=config['resources']['bcftools_merge']['mem_mb']
+        mem_mb=config["resources"]["bcftools_merge"]["mem_mb"],
     conda:
         "../envs/bcftools.yml"
     shell:
