@@ -7,11 +7,17 @@ rule alignment_summary_before_recalibration:
     log:
         "logs/picard/alignment-summary/{sample}.log",
     params:
-        extra="--VALIDATION_STRINGENCY LENIENT --METRIC_ACCUMULATION_LEVEL null --METRIC_ACCUMULATION_LEVEL SAMPLE",
+        extra=(
+            f"--VALIDATION_STRINGENCY {config['preprocessing']['alignment_summary']['validation_stringency']} "
+            f"--METRIC_ACCUMULATION_LEVEL null "
+            f"--METRIC_ACCUMULATION_LEVEL {config['preprocessing']['alignment_summary']['metric_accumulation_level']} "
+            f"{config['preprocessing']['alignment_summary']['extra']}"
+        ),
+    threads: config['resources']['alignment_summary']['threads']
     resources:
-        mem_mb=1024,
+        mem_mb=config['resources']['alignment_summary']['mem_mb'],
     wrapper:
-        "v3.12.1/bio/picard/collectalignmentsummarymetrics"
+        config['wrappers']['version'] + "/bio/picard/collectalignmentsummarymetrics"
 
 
 rule alignment_summary_after_recalibration:
@@ -23,8 +29,14 @@ rule alignment_summary_after_recalibration:
     log:
         "logs/picard/alignment-summary/{sample}.log",
     params:
-        extra="--VALIDATION_STRINGENCY LENIENT --METRIC_ACCUMULATION_LEVEL null --METRIC_ACCUMULATION_LEVEL SAMPLE",
+        extra=(
+            f"--VALIDATION_STRINGENCY {config['preprocessing']['alignment_summary']['validation_stringency']} "
+            f"--METRIC_ACCUMULATION_LEVEL null "
+            f"--METRIC_ACCUMULATION_LEVEL {config['preprocessing']['alignment_summary']['metric_accumulation_level']} "
+            f"{config['preprocessing']['alignment_summary']['extra']}"
+        ),
+    threads: config['resources']['alignment_summary']['threads']
     resources:
-        mem_mb=1024,
+        mem_mb=config['resources']['alignment_summary']['mem_mb'],
     wrapper:
-        "v3.12.1/bio/picard/collectalignmentsummarymetrics"
+        config['wrappers']['version'] + "/bio/picard/collectalignmentsummarymetrics"

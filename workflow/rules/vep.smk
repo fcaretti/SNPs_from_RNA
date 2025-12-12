@@ -47,14 +47,16 @@ rule vep_annotation:
     params:
         cache_dir=lambda wc: config["vep"]["cache_dir"],
         species=lambda wc: config["vep"]["species"],
+        extra=lambda wc: config["vep"]["extra"],
     container:
         config["vep"]["image"]
     resources:
-        cores=4,
+        cores=config['resources']['vep']['cores'],
+        mem_mb=config['resources']['vep']['mem_mb']
     log:
         log_file="logs/vep/vep_annotation.log",
     shell:
         """
-        vep --input_file {input.vcf} --output_file {output.annotated_vcf} --offline --vcf --species homo_sapiens \
-            --cache --dir_cache {params.cache_dir} --force_overwrite --fork {resources.cores} > {log.log_file} 2>&1
+        vep --input_file {input.vcf} --output_file {output.annotated_vcf} --offline --vcf --species {params.species} \
+            --cache --dir_cache {params.cache_dir} --force_overwrite --fork {resources.cores} {params.extra} > {log.log_file} 2>&1
         """

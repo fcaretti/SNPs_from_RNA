@@ -11,16 +11,17 @@ rule deepvariant:
     log:
         "logs/deepvariant/{sample}.log",
     params:
-        model_type="WGS",
-        extra="",
-    threads: 8
+        model_type=config['variant_calling']['deepvariant']['model_type'],
+        extra=config['variant_calling']['deepvariant']['extra'],
+        tmpdir=config['variant_calling']['deepvariant']['tmpdir'],
+    threads: config['resources']['deepvariant']['threads']
     resources:
-        mem_mb=16384,
+        mem_mb=config['resources']['deepvariant']['mem_mb'],
     container:
-        "docker://google/deepvariant:1.6.1"
+        config['variant_calling']['deepvariant']['container']
     shell:
         """
-        export TMPDIR=/tmp  # Use container's /tmp instead
+        export TMPDIR={params.tmpdir}
         /opt/deepvariant/bin/run_deepvariant \
             --model_type={params.model_type} \
             --ref={input.ref} \
@@ -41,9 +42,12 @@ rule deepvariant_bcftools_index:
     log:
         "logs/deepvariant_index/{sample}.log",
     params:
-        extra="-c",
+        extra=config['variant_calling']['deepvariant']['index_extra'],
+    threads: config['resources']['bcftools_index']['threads']
+    resources:
+        mem_mb=config['resources']['bcftools_index']['mem_mb']
     wrapper:
-        "v3.12.1/bio/bcftools/index"
+        config['wrappers']['version'] + "/bio/bcftools/index"
 
 # Merge DeepVariant calls (same as GATK)
 rule merge_deepvariant:
@@ -56,6 +60,9 @@ rule merge_deepvariant:
         "logs/merge/merge_deepvariant.log",
     params:
         uncompressed_bcf=False,
-        extra="",
+        extra=config['variant_calling']['deepvariant']['merge_extra'],
+    threads: config['resources']['bcftools_merge']['threads']
+    resources:
+        mem_mb=config['resources']['bcftools_merge']['mem_mb']
     wrapper:
-        "v3.12.1/bio/bcftools/merge"
+        config['wrappers']['version'] + "/bio/bcftools/merge"

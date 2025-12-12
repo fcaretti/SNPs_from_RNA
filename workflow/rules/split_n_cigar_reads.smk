@@ -9,9 +9,10 @@ rule splitncigarreads:
     log:
         "logs/splitNCIGARreads/{sample}.log",
     params:
-        extra="",  # optional
-        java_mem_overhead_mb=512,  # Specify overhead for non-heap memory
+        extra=config['preprocessing']['split_n_cigar']['extra'],
+        java_mem_overhead_mb=config['preprocessing']['split_n_cigar']['java_mem_overhead_mb'],
+    threads: config['resources']['split_n_cigar']['threads']
     resources:
-        mem_mb=4096,  # Total memory available for the rule
+        mem_mb=config['resources']['split_n_cigar']['mem_mb'],
     wrapper:
-        "v3.12.1/bio/gatk/splitncigarreads"
+        config['wrappers']['version'] + "/bio/gatk/splitncigarreads"

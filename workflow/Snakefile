@@ -25,6 +25,18 @@ known_sites_idx = f"{known_sites}.idx"
 sample_files = glob.glob(os.path.join(data_folder, "*.bam"))
 samples = [os.path.basename(f).replace(".bam", "") for f in sample_files]
 
+# Determine if BAM filtering is enabled
+bam_filtering_enabled = config.get('bam_filtering', {}).get('enabled', False)
+
+# Define input BAMs for the pipeline
+# If filtering is enabled, use filtered BAMs; otherwise use original BAMs
+if bam_filtering_enabled:
+    input_bam_folder = f"{results_folder}/filtered_bams"
+    filtered_bams = [f"{input_bam_folder}/{sample}.bam" for sample in samples]
+else:
+    input_bam_folder = data_folder
+    filtered_bams = []
+
 first_summaries = [
     f"{results_folder}/stats/{sample}_before_recal.summary.txt" for sample in samples
 ]
@@ -42,19 +54,74 @@ haplo_calls = f"{results_folder}/calls/calls_gatk.vcf"
 fb_calls = f"{results_folder}/calls/calls_freebayes.vcf"
 dv_calls = f"{results_folder}/calls/calls_deepvariant.vcf"
 
+# ============================================================================
+# DYNAMIC CALLER SELECTION
+# ============================================================================
+# Get enabled variant callers from config
+enabled_callers = config.get('variant_calling', {}).get('enabled_callers', ['freebayes'])
+merge_strategy = config.get('variant_calling', {}).get('merge_strategy', 'OR')
+
+# Validate caller selection
+valid_callers = ['freebayes', 'gatk', 'deepvariant']
+for caller in enabled_callers:
+    if caller not in valid_callers:
+        raise ValueError(
+            f"Invalid caller '{caller}' in config. "
+            f"Must be one of {valid_callers}. "
+            f"Check variant_calling.enabled_callers in config.yml"
+        )
+
+# Map caller names to their output VCF files
+caller_outputs = {
+    'freebayes': fb_calls,
+    'gatk': haplo_calls,
+    'deepvariant': dv_calls
+}
+
+# Build list of raw VCF outputs for enabled callers
+raw_vcf_outputs = [caller_outputs[caller] for caller in enabled_callers]
+
+# Build list of filtered VCF outputs for enabled callers
+filtered_vcf_outputs = [
+    f"{results_folder}/calls/filtered_calls_{caller}.vcf"
+    for caller in enabled_callers
+]
+
+# Determine final output based on number of enabled callers and merge strategy
+if len(enabled_callers) > 1:
+    # Multiple callers: produce merged output
+    if merge_strategy.upper() == "OR":
+        final_vcf = f"{results_folder}/calls/merged_union.vcf"
+    elif merge_strategy.upper() == "AND":
+        final_vcf = f"{results_folder}/calls/merged_intersection.vcf"
+    else:
+        raise ValueError(
+            f"Invalid merge_strategy '{merge_strategy}'. "
+            f"Must be 'OR' or 'AND'. "
+            f"Check variant_calling.merge_strategy in config.yml"
+        )
+    final_outputs = [final_vcf]
+else:
+    # Single caller: use its filtered output
+    final_outputs = filtered_vcf_outputs
+
 rule all:
     input:
         #f"{results_folder}/calls/annotated_calls.vcf",
+        filtered_bams if bam_filtering_enabled else [],  # Include filtered BAMs if enabled
         first_summaries,
         second_summaries,
-        #f"{results_folder}/calls/filtered_calls_freebayes.vcf",
-        #f"{results_folder}/calls/filtered_calls_deepvariant.vcf",
-        #haplo_calls,
-        fb_calls,
-        #dv_calls,
-        #f"{results_folder}/calls_deepvariant/TT71.vcf.gz",
+        final_outputs,  # Dynamic: filtered VCFs or merged VCF based on enabled callers
 
 
+# ============================================================================
+# INCLUDE RULE FILES
+# ============================================================================
+
+# BAM filtering (optional preprocessing step)
+include: "rules/filter_bam_regions.smk"
+
+# Preprocessing rules (always included)
 include: "rules/add_or_replace_rg.smk"
 include: "rules/mark_duplicates.smk"
 include: "rules/index_genome.smk"
@@ -62,8 +129,23 @@ include: "rules/sanitize.smk"
 include: "rules/split_n_cigar_reads.smk"
 include: "rules/recalibration.smk"
 include: "rules/alignment_summary.smk"
-include: "rules/gatk_haplocaller.smk"
-include: "rules/freebayes.smk"
-include: "rules/deepvariant.smk"
+
+# Variant caller rules (conditionally included based on enabled_callers)
+if 'gatk' in enabled_callers:
+    include: "rules/gatk_haplocaller.smk"
+
+if 'freebayes' in enabled_callers:
+    include: "rules/freebayes.smk"
+
+if 'deepvariant' in enabled_callers:
+    include: "rules/deepvariant.smk"
+
+# Filtering and merging rules
 include: "rules/filter.smk"
+
+# Multi-caller merge rules (only needed if multiple callers enabled)
+if len(enabled_callers) > 1:
+    include: "rules/merge_callers.smk"
+
+# VEP annotation (optional)
 include: "rules/vep.smk"

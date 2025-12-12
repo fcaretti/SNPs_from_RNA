@@ -1,25 +1,288 @@
+# ============================================================================
+# SNPs_from_RNA Workflow Configuration
+# ============================================================================
+# This configuration file contains ALL parameters for the variant calling pipeline.
+# No values should be hardcoded in the workflow - everything is configurable here.
+
+# ============================================================================
+# DATA AND REFERENCE PATHS
+# ============================================================================
 data:
-  folder: "data_folder"
+  folder: "data_folder"  # Path to input BAM files
 
 results:
-  folder: "results_folder"
+  folder: "results_folder"  # Path to output directory
 
 reference:
-  folder: "reference_folder"
-  genome: "genome.fa"
+  folder: "reference_folder"  # Path to reference genome directory
+  genome: "genome.fa"  # Reference genome FASTA file name
 
 known_sites:
-  folder: "known_sites_folder"
+  folder: "known_sites_folder"  # Path to known variants directory
   filename: "ex: resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
 
-filtering:
-  params: "ex: -i 'QUAL > 30 && INFO/DP > 10'"
+# ============================================================================
+# BAM FILTERING BY CHROMOSOMES/REGIONS (Optional Preprocessing)
+# ============================================================================
+# Filter input BAM files to retain only specified chromosomes or genomic regions
+# This is useful for:
+# - Analyzing only autosomes (exclude X, Y, MT)
+# - Focusing on specific chromosomes
+# - Excluding decoy sequences and unplaced contigs
+# - Speeding up analysis by reducing data size
 
+bam_filtering:
+  enabled: false  # Set to true to enable BAM filtering
+
+  # Option 1: Specify list of chromosomes/regions to keep
+  regions: []  # Example: ["chr1", "chr2", "chr3"] or ["1", "2", "3"]
+
+  # Option 2: Use BED file for complex genomic regions
+  bed_file: ""  # Example: "path/to/regions_of_interest.bed"
+
+  # Note: If both regions and bed_file are specified, bed_file takes precedence
+
+# ============================================================================
+# VARIANT CALLING CONFIGURATION
+# ============================================================================
+# Select which variant callers to use and configure their parameters
+
+variant_calling:
+  # List of callers to enable: ["freebayes"], ["gatk"], ["deepvariant"], or any combination
+  # Example: ["freebayes", "gatk"] to use both
+  enabled_callers: ["freebayes"]
+
+  # Merge strategy when multiple callers are selected
+  # "OR" (union): Report a variant if ANY caller detects it (maximum sensitivity)
+  # "AND" (intersection): Report a variant ONLY if ALL callers detect it (maximum specificity)
+  merge_strategy: "OR"
+
+  # -------------------- FreeBayes Configuration --------------------
+  freebayes:
+    # Core FreeBayes parameters
+    min_alternate_fraction: 0.2  # Minimum fraction of observations supporting an alternate
+    min_coverage: 5  # Minimum read depth to consider a site
+    use_best_n_alleles: 4  # Evaluate only best N alleles
+    max_complex_gap: 3  # Maximum gapped alignment length
+    chunksize: 100000  # Process genome in chunks of this size
+
+    # Additional FreeBayes flags (these are included by default)
+    # --pooled-continuous: Assume pooled continuous allele frequency spectrum
+    # --report-genotype-likelihood-max: Report max genotype likelihood
+    # --genotype-qualities: Calculate genotype qualities
+
+    # Extra parameters to pass to FreeBayes (optional)
+    extra: ""  # Example: "--min-mapping-quality 20 --min-base-quality 20"
+
+  # -------------------- GATK HaplotypeCaller Configuration --------------------
+  gatk:
+    # Extra parameters for HaplotypeCaller
+    # Recommended for RNA-seq: "-dont-use-soft-clipped-bases"
+    extra: ""  # Example: "-dont-use-soft-clipped-bases -stand-call-conf 20.0"
+
+    # JVM options for GATK
+    java_opts: ""  # Example: "-Xmx4g"
+
+    # bcftools merge parameters (for combining per-sample VCFs)
+    merge_extra: ""  # Extra parameters for bcftools merge
+
+    # bcftools index type
+    index_extra: "-c"  # -c for CSI index, -t for TBI index
+
+  # -------------------- DeepVariant Configuration --------------------
+  deepvariant:
+    # Model type: "WGS", "WES", "PACBIO", "HYBRID_PACBIO_ILLUMINA"
+    # Note: For RNA-seq, consider using "WES" instead of "WGS"
+    model_type: "WGS"
+
+    # Docker container image
+    container: "docker://google/deepvariant:1.6.1"
+
+    # Extra parameters for DeepVariant
+    extra: ""  # Example: "--vsc_min_fraction_indels 0.12"
+
+    # Temporary directory for DeepVariant
+    tmpdir: "/tmp"
+
+    # bcftools merge parameters
+    merge_extra: ""
+    index_extra: "-c"
+
+# ============================================================================
+# VARIANT FILTERING CONFIGURATION
+# ============================================================================
+# Configure filtering parameters for each variant caller
+# Priority: caller-specific > default > percentile > no filtering
+
+filtering:
+  # Default filtering parameters (used if no caller-specific params provided)
+  default_params: "-i 'QUAL > 30 && INFO/DP > 10'"
+
+  # -------------------- Per-Caller Filtering --------------------
+  # FreeBayes filtering
+  freebayes:
+    params: "-i 'QUAL > 20 && INFO/DP > 5 && MIN(FMT/GQ) > 15'"
+
+  # GATK HaplotypeCaller filtering
+  gatk:
+    params: "-i 'QUAL > 30 && INFO/QD > 2.0 && INFO/FS < 60.0 && INFO/MQ > 40.0'"
+
+  # DeepVariant filtering (minimal filtering recommended for ML-based caller)
+  deepvariant:
+    params: "-i 'QUAL > 10'"
+
+  # -------------------- Percentile-Based Filtering (Fallback) --------------------
+  # ⚠️  WARNING: Percentile filtering is NOT RECOMMENDED for RNA-seq variant calling!
+  #
+  # Why NOT recommended:
+  # 1. Percentile filtering is data-dependent and varies between samples
+  # 2. Does not account for biological significance or known quality metrics
+  # 3. May retain low-quality variants or filter out true positives
+  # 4. Not reproducible across different datasets
+  #
+  # This is ONLY a fallback when no filter parameters are specified.
+  # STRONGLY PREFER using caller-specific or default filtering parameters
+  # based on established quality thresholds (QUAL, DP, GQ, QD, FS, MQ, etc.).
+  #
+  # Percentile filtering should only be used for:
+  # - Initial data exploration
+  # - When you have NO knowledge of appropriate filtering thresholds
+  # - As a temporary measure before establishing proper filters
+  percentile:
+    enabled: false  # Set to true to enable percentile filtering (NOT RECOMMENDED)
+
+    # Percentile thresholds: variants BELOW these percentiles are filtered out
+    # Lower percentile = more permissive (keeps more variants)
+    # Higher percentile = more stringent (filters more variants)
+    qual_percentile: 10  # Filter out bottom 10% of variants by QUAL score
+    dp_percentile: 10    # Filter out bottom 10% of variants by depth (DP)
+
+# ============================================================================
+# PREPROCESSING CONFIGURATION
+# ============================================================================
+# Configure parameters for BAM preprocessing steps
+
+preprocessing:
+  # -------------------- Read Group Replacement --------------------
+  read_groups:
+    library: "lib1"  # Library name (RGLB)
+    platform: "illumina"  # Sequencing platform (RGPL): illumina, ILLUMINA, etc.
+    # Note: RGID, RGPU, and RGSM are set to {sample} automatically
+    # Additional parameters can be added here if needed
+    extra: ""  # Extra Picard parameters
+
+  # -------------------- Mark Duplicates --------------------
+  mark_duplicates:
+    remove_duplicates: true  # true to remove duplicates, false to only mark them
+    extra: ""  # Extra Picard MarkDuplicates parameters
+
+  # -------------------- Split N-CIGAR Reads (RNA-seq specific) --------------------
+  split_n_cigar:
+    extra: ""  # Extra GATK SplitNCigarReads parameters
+    java_mem_overhead_mb: 512  # JVM memory overhead (non-heap memory)
+
+  # -------------------- Base Quality Score Recalibration (BQSR) --------------------
+  base_recalibration:
+    extra: ""  # Extra GATK BaseRecalibrator parameters
+    java_opts: ""  # JVM options
+
+  apply_bqsr:
+    extra: ""  # Extra GATK ApplyBQSR parameters
+    java_opts: ""  # JVM options
+    embed_ref: true  # Embed reference in CRAM output (set false for BAM)
+
+  # -------------------- Alignment Summary Metrics --------------------
+  alignment_summary:
+    validation_stringency: "LENIENT"  # STRICT, LENIENT, or SILENT
+    metric_accumulation_level: "SAMPLE"  # SAMPLE, READ_GROUP, LIBRARY, etc.
+    extra: ""  # Extra Picard CollectAlignmentSummaryMetrics parameters
+
+# ============================================================================
+# VEP ANNOTATION CONFIGURATION
+# ============================================================================
 vep:
-  cache_dir: ""
-  zip_name: "ex: homo_sapiens_vep_112_GRCh38.tar.gz"
-  url: "ex: https://ftp.ensembl.org/pub/release-112/variation/indexed_vep_cache/homo_sapiens_vep_112_GRCh38.tar.gz"
-  image: "ex: docker://ensemblorg/ensembl-vep:release_112.0"
-  filters: "--filter "
-  impact_levels: [ "MODERATE", "HIGH"]
-  species: "ex: homo_sapiens"
+  cache_dir: ""  # Path to VEP cache directory
+  zip_name: "ex: homo_sapiens_vep_115_GRCh38.tar.gz"
+  url: "ex: https://ftp.ensembl.org/pub/release-115/variation/indexed_vep_cache/homo_sapiens_vep_115_GRCh38.tar.gz"
+  image: "ex: docker://ensemblorg/ensembl-vep:release_115.0"
+  species: "ex: homo_sapiens"  # Species name for VEP
+  filters: "--filter "  # VEP filter string
+  impact_levels: ["MODERATE", "HIGH"]  # Impact levels to keep
+  extra: ""  # Extra VEP parameters
+
+# ============================================================================
+# RESOURCE ALLOCATION (Threads and Memory)
+# ============================================================================
+# Configure computational resources for each step
+# All values can be adjusted based on your system capabilities
+
+resources:
+  # -------------------- BAM Filtering --------------------
+  filter_bam:
+    threads: 4
+
+  # -------------------- Preprocessing Steps --------------------
+  add_replace_rg:
+    threads: 1
+    mem_mb: 1024
+
+  mark_duplicates:
+    threads: 1
+    mem_mb: 1024
+
+  split_n_cigar:
+    threads: 1
+    mem_mb: 4096
+
+  base_recalibrator:
+    threads: 1
+    mem_mb: 1024
+
+  apply_bqsr:
+    threads: 1
+    mem_mb: 1024
+
+  alignment_summary:
+    threads: 1
+    mem_mb: 1024
+
+  # -------------------- Variant Calling --------------------
+  freebayes:
+    threads: 32  # FreeBayes benefits from many threads
+    mem_mb: 4096
+
+  gatk_haplotypecaller:
+    threads: 4
+    mem_mb: 1024
+
+  deepvariant:
+    threads: 8  # DeepVariant uses num_shards parameter
+    mem_mb: 16384
+
+  # -------------------- VCF Processing --------------------
+  bgzip:
+    threads: 1
+    mem_mb: 1024
+
+  bcftools_index:
+    threads: 1
+    mem_mb: 1024
+
+  bcftools_merge:
+    threads: 1
+    mem_mb: 2048
+
+  bcftools_filter:
+    threads: 1
+    mem_mb: 1024
+
+  # -------------------- VEP Annotation --------------------
+  vep:
+    cores: 4  # Number of cores for VEP (--fork parameter)
+    mem_mb: 4096
+
+# ============================================================================
+# WORKFLOW METADATA
+# ============================================================================
+wrappers:
+  version: "v3.12.1"  # Snakemake wrappers version to use

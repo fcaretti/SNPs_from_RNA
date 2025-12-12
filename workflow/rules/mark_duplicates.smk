@@ -7,8 +7,12 @@ rule markduplicates_bam:
     log:
         "logs/dedup_bam/{sample}.log",
     params:
-        extra="--REMOVE_DUPLICATES true",
+        extra=(
+            f"--REMOVE_DUPLICATES {str(config['preprocessing']['mark_duplicates']['remove_duplicates']).lower()} "
+            f"{config['preprocessing']['mark_duplicates']['extra']}"
+        ),
+    threads: config['resources']['mark_duplicates']['threads']
     resources:
-        mem_mb=1024,
+        mem_mb=config['resources']['mark_duplicates']['mem_mb'],
     wrapper:
-        "v3.12.1/bio/picard/markduplicates"
+        config['wrappers']['version'] + "/bio/picard/markduplicates"

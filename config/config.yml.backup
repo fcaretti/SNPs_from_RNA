@@ -1,0 +1,40 @@
+data:
+  folder: "data_folder"
+
+# BAM Filtering by Chromosomes/Regions (optional preprocessing step)
+# Set enabled: true to filter BAM files before variant calling
+bam_filtering:
+  enabled: false  # Set to true to enable filtering
+  # Option 1: Specify list of chromosomes/regions to keep
+  regions: []  # Example: ["chr1", "chr2", "chr3"] or ["1", "2", "3"]
+  # Option 2: Use BED file for complex regions
+  bed_file: ""  # Example: "path/to/regions_of_interest.bed"
+  # Note: If both are specified, BED file takes precedence
+
+results:
+  folder: "results_folder"
+
+reference:
+  folder: "reference_folder"
+  genome: "genome.fa"
+
+known_sites:
+  folder: "known_sites_folder"
+  filename: "ex: resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
+
+filtering:
+  params: "ex: -i 'QUAL > 30 && INFO/DP > 10'"
+
+vep:
+  cache_dir: ""
+  zip_name: "ex: homo_sapiens_vep_112_GRCh38.tar.gz"
+  url: "ex: https://ftp.ensembl.org/pub/release-112/variation/indexed_vep_cache/homo_sapiens_vep_112_GRCh38.tar.gz"
+  image: "ex: docker://ensemblorg/ensembl-vep:release_112.0"
+  filters: "--filter "
+  impact_levels: [ "MODERATE", "HIGH"]
+  species: "ex: homo_sapiens"
+
+# Resource allocation (threads, memory)
+resources:
+  filter_bam:
+    threads: 4  # Number of threads for BAM filtering
