@@ -1,7 +1,6 @@
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - cyvcf2=0.30.28
   - numpy=1.24.3
