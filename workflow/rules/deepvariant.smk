@@ -1,8 +1,9 @@
 # DeepVariant variant calling (using Singularity)
 rule deepvariant:
     input:
-        bam=results_folder + "/recal/{sample}.bam",
-        bai=results_folder + "/recal/{sample}.bai",
+        # Uses recal BAMs if BQSR enabled, split BAMs otherwise
+        bam=calling_bam_folder + "/{sample}.bam",
+        bai=calling_bam_folder + "/{sample}.bai",
         ref=reference,
         fai=reference_idx,
     output:

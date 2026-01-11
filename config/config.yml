@@ -182,6 +182,16 @@ preprocessing:
     java_mem_overhead_mb: 512  # JVM memory overhead (non-heap memory)
 
   # -------------------- Base Quality Score Recalibration (BQSR) --------------------
+  # BQSR is OPTIONAL and can be disabled. Reasons to disable:
+  # 1. You don't have a known_sites VCF (dbSNP)
+  # 2. BQSR may be affecting heterozygous calls (downgrading alt allele quality)
+  # 3. Some RNA-seq protocols recommend skipping BQSR entirely
+  # 4. Faster processing (skips 2 GATK steps)
+  #
+  # NOTE: If BQSR is disabled, variant calling will use split BAMs directly
+  bqsr:
+    enabled: true  # Set to false to skip Base Quality Score Recalibration
+
   base_recalibration:
     extra: ""  # Extra GATK BaseRecalibrator parameters
     java_opts: ""  # JVM options

@@ -17,6 +17,8 @@ rule sanitize_bam_for_splitncigar:
     threads: 4
     log:
         results_folder + "/logs/sanitize/{sample}.log",
+    conda:
+        "../envs/samtools.yml",
     shell:
         """
         # Create directories first

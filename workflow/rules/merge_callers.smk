@@ -17,11 +17,93 @@ The strategy is controlled by config['variant_calling']['merge_strategy']
 
 
 # ============================================================================
+# Helper Rules: Compress and Index Filtered VCFs for Merging
+# ============================================================================
+# bcftools merge requires bgzipped and indexed VCF files
+# These rules compress the plain text filtered VCFs and create tabix indices
+
+rule bgzip_filtered_freebayes:
+    input:
+        f"{results_folder}/calls/filtered_calls_freebayes.vcf",
+    output:
+        temp(f"{results_folder}/calls/filtered_calls_freebayes.vcf.gz"),
+    threads: config["resources"]["bgzip"]["threads"]
+    resources:
+        mem_mb=config["resources"]["bgzip"]["mem_mb"],
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "bgzip -c {input} > {output}"
+
+
+rule bgzip_filtered_gatk:
+    input:
+        f"{results_folder}/calls/filtered_calls_gatk.vcf",
+    output:
+        temp(f"{results_folder}/calls/filtered_calls_gatk.vcf.gz"),
+    threads: config["resources"]["bgzip"]["threads"]
+    resources:
+        mem_mb=config["resources"]["bgzip"]["mem_mb"],
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "bgzip -c {input} > {output}"
+
+
+rule bgzip_filtered_deepvariant:
+    input:
+        f"{results_folder}/calls/filtered_calls_deepvariant.vcf",
+    output:
+        temp(f"{results_folder}/calls/filtered_calls_deepvariant.vcf.gz"),
+    threads: config["resources"]["bgzip"]["threads"]
+    resources:
+        mem_mb=config["resources"]["bgzip"]["mem_mb"],
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "bgzip -c {input} > {output}"
+
+
+rule tabix_filtered_freebayes:
+    input:
+        f"{results_folder}/calls/filtered_calls_freebayes.vcf.gz",
+    output:
+        temp(f"{results_folder}/calls/filtered_calls_freebayes.vcf.gz.tbi"),
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "tabix -p vcf {input}"
+
+
+rule tabix_filtered_gatk:
+    input:
+        f"{results_folder}/calls/filtered_calls_gatk.vcf.gz",
+    output:
+        temp(f"{results_folder}/calls/filtered_calls_gatk.vcf.gz.tbi"),
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "tabix -p vcf {input}"
+
+
+rule tabix_filtered_deepvariant:
+    input:
+        f"{results_folder}/calls/filtered_calls_deepvariant.vcf.gz",
+    output:
+        temp(f"{results_folder}/calls/filtered_calls_deepvariant.vcf.gz.tbi"),
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "tabix -p vcf {input}"
+
+
+# ============================================================================
 # OR Strategy (Union): Merge all variants from all callers
 # ============================================================================
 rule merge_callers_union:
     input:
-        vcfs=filtered_vcf_outputs,
+        vcfs=[f"{results_folder}/calls/filtered_calls_{caller}.vcf.gz" for caller in enabled_callers],
+        indices=[f"{results_folder}/calls/filtered_calls_{caller}.vcf.gz.tbi" for caller in enabled_callers],
     output:
         vcf=results_folder + "/calls/merged_union.vcf",
     log:
@@ -51,7 +133,8 @@ rule merge_callers_union:
 # ============================================================================
 rule merge_callers_intersection:
     input:
-        vcfs=filtered_vcf_outputs,
+        vcfs=[f"{results_folder}/calls/filtered_calls_{caller}.vcf.gz" for caller in enabled_callers],
+        indices=[f"{results_folder}/calls/filtered_calls_{caller}.vcf.gz.tbi" for caller in enabled_callers],
     output:
         vcf=results_folder + "/calls/merged_intersection.vcf",
         temp_dir=temp(directory(results_folder + "/calls/isec_tmp")),

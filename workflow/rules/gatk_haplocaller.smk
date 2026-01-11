@@ -1,7 +1,7 @@
 rule haplotype_caller:
     input:
-        # single or list of bam files
-        bam=results_folder + "/recal/{sample}.bam",
+        # Uses recal BAMs if BQSR enabled, split BAMs otherwise
+        bam=calling_bam_folder + "/{sample}.bam",
         ref=reference,
     output:
         vcf=results_folder + "/calls_gatk/{sample}.vcf",

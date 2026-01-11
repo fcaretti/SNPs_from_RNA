@@ -1,7 +1,7 @@
 # Joint call all BAMs into ONE cohort VCF using the Snakemake freebayes wrapper
 rule freebayes:
     input:
-        alns=alns,
+        alns=calling_bams,  # Uses recal BAMs if BQSR enabled, split BAMs otherwise
         ref=reference,
     output:
         vcf=results_folder + "/calls/calls_freebayes.vcf",
@@ -12,8 +12,6 @@ rule freebayes:
             f"--min-alternate-fraction {config['variant_calling']['freebayes']['min_alternate_fraction']} "
             f"--min-coverage {config['variant_calling']['freebayes']['min_coverage']} "
             "--pooled-continuous "
-            f"--use-best-n-alleles {config['variant_calling']['freebayes']['use_best_n_alleles']} "
-            f"--max-complex-gap {config['variant_calling']['freebayes']['max_complex_gap']} "
             "--report-genotype-likelihood-max "
             "--genotype-qualities "
             f"{config['variant_calling']['freebayes']['extra']}"

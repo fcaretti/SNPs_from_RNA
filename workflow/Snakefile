@@ -37,12 +37,30 @@ else:
     input_bam_folder = data_folder
     filtered_bams = []
 
+# Determine if BQSR (Base Quality Score Recalibration) is enabled
+bqsr_enabled = config.get("preprocessing", {}).get("bqsr", {}).get("enabled", True)
+
+# Define which BAMs to use for variant calling
+# If BQSR enabled: use recalibrated BAMs from /recal/
+# If BQSR disabled: use split BAMs from /split/
+if bqsr_enabled:
+    calling_bam_folder = f"{results_folder}/recal"
+    calling_bams = [f"{calling_bam_folder}/{sample}.bam" for sample in samples]
+else:
+    calling_bam_folder = f"{results_folder}/split"
+    calling_bams = [f"{calling_bam_folder}/{sample}.bam" for sample in samples]
+
 first_summaries = [
     f"{results_folder}/stats/{sample}_before_recal.summary.txt" for sample in samples
 ]
-second_summaries = [
-    f"{results_folder}/stats/{sample}_after_recal.summary.txt" for sample in samples
-]
+
+# Second summaries only if BQSR is enabled
+if bqsr_enabled:
+    second_summaries = [
+        f"{results_folder}/stats/{sample}_after_recal.summary.txt" for sample in samples
+    ]
+else:
+    second_summaries = []
 calls = [f"{results_folder}/calls/{sample}.vcf" for sample in samples]
 alns = [f"{results_folder}/recal/{sample}.bam" for sample in samples]
 idxs = [f"{results_folder}/recal/{sample}.bai" for sample in samples]
@@ -125,7 +143,11 @@ include: "rules/mark_duplicates.smk"
 include: "rules/index_genome.smk"
 include: "rules/sanitize.smk"
 include: "rules/split_n_cigar_reads.smk"
-include: "rules/recalibration.smk"
+
+# Recalibration (optional - only if BQSR enabled)
+if bqsr_enabled:
+    include: "rules/recalibration.smk"
+
 include: "rules/alignment_summary.smk"
 
 
